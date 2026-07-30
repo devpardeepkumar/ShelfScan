@@ -1,0 +1,26 @@
+{
+  "name": "books-scraper",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "verify:schema": "node scripts/verify-schema.mjs",
+    "typecheck:functions": "tsc --noEmit -p supabase/functions/tsconfig.json"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.4",
+    "fast-json-stable-stringify": "^2.1.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.2",
+    "typescript": "~5.9.2",
+    "vite": "^7.1.3"
+  }
+}
