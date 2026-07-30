@@ -1,19 +1,37 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-/** Public client config — anon/publishable key is safe in the browser (RLS enforced). */
-const DEFAULT_SUPABASE_URL = "https://wcrhpqnplrutoooowmjt.supabase.co";
-const DEFAULT_SUPABASE_ANON_KEY =
+/**
+ * Hardcoded public client config for ShelfScan.
+ * The anon/publishable key is safe in the browser (RLS enforced).
+ * Env vars can override when present; empty Lovable placeholders must not win.
+ */
+const FALLBACK_URL = "https://wcrhpqnplrutoooowmjt.supabase.co";
+const FALLBACK_ANON_KEY =
   "sb_publishable_PeX-jxejW12XIEHMbFIsrQ_q6_3ksJ4";
 
-const url =
-  (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.trim() ||
-  DEFAULT_SUPABASE_URL;
-const anonKey =
-  (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined)?.trim() ||
-  DEFAULT_SUPABASE_ANON_KEY;
+function resolveConfig(): { url: string; anonKey: string } {
+  const fromEnvUrl = [
+    import.meta.env.VITE_SUPABASE_URL,
+    import.meta.env.VITE_SUPABASE_PROJECT_URL,
+  ]
+    .map((v) => (typeof v === "string" ? v.trim() : ""))
+    .find((v) => v.startsWith("http"));
 
-export const isSupabaseConfigured = Boolean(url && anonKey);
+  const fromEnvKey = [
+    import.meta.env.VITE_SUPABASE_ANON_KEY,
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+  ]
+    .map((v) => (typeof v === "string" ? v.trim() : ""))
+    .find((v) => v.length > 20);
 
-export const supabase: SupabaseClient | null = isSupabaseConfigured
-  ? createClient(url, anonKey)
-  : null;
+  return {
+    url: fromEnvUrl || FALLBACK_URL,
+    anonKey: fromEnvKey || FALLBACK_ANON_KEY,
+  };
+}
+
+const { url, anonKey } = resolveConfig();
+
+export const isSupabaseConfigured = true;
+
+export const supabase: SupabaseClient = createClient(url, anonKey);
